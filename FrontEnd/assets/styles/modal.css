@@ -1,0 +1,371 @@
+/* ================================
+   MODAL STYLES
+   ================================ */
+
+/* Base Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease; /* animation sur l'opacité du background */
+}
+
+.modal[aria-modal="true"] {
+    opacity: 1;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 10px;
+    max-width: 630px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    position: relative;
+    margin: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 25px;
+}
+
+/* Gestion d'animation d'apparition du modal*/
+.modal[aria-modal="true"] .modal-content {
+    transform: translateY(0);
+}
+
+/* Modal Header */
+.modal-title{
+    margin-bottom: 30px;
+}
+
+.modal h2 {
+    text-align: center;
+    margin: 0;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: #000;
+}
+
+.close-btn,
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    color: #000;
+    transition: color 0.2s ease;
+}
+
+.close-btn,
+.back-btn:hover {
+    color: #666;
+}
+
+.close-btn,
+.back-btn i {
+    width: 24px;
+    height: 24px;
+}
+
+/* ================================
+   MODAL GALLERY STYLES
+   ================================ */
+
+/* Masquage du bouton de retour dans la galerie */ 
+#modal-gallery .back-btn {
+    visibility : hidden;
+    pointer-events: none;
+}
+
+.modal-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 47px;
+}
+
+.modal-work-item {
+    position: relative;
+}
+
+.work-image-container {
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.work-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.delete-work-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 2px;
+    width: 17px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 9px;
+    transition: background 0.2s ease;
+}
+
+.delete-work-btn:hover {
+    background: #666;
+}
+
+.no-works {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+}
+
+/* ================================
+   MODAL ADD PHOTO STYLES
+   ================================ */
+
+.photo-upload-zone {
+    margin-bottom: 30px;
+}
+
+.upload-area {
+    border: 2px dashed #B3B3B3;
+    border-radius: 3px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    background: #E8F0FE;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #1D6154;
+    background: #f0f8f6;
+}
+
+.upload-area.dragover {
+    border-color: #1D6154;
+    background: #e8f5f0;
+}
+
+.upload-icon {
+    font-size: 58px;
+    color: #B3B3B3;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.btn-choose-file {
+    background: #CBD6DC;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.btn-choose-file:hover {
+    background: #b3c4cc;
+}
+
+.upload-info {
+    color: #444;
+    font-size: 10px;
+    margin: 10px 0 0 0;
+}
+
+.image-preview {
+    text-align: center;
+    padding: 20px;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-family: 'Work Sans', sans-serif;
+    color: #3D3D3D;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background: white;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+    font-size: 14px;
+    font-family: 'Work Sans', sans-serif;
+    border-radius: 3px;
+    transition: box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Divider */
+.modal-divider {
+    border: none;
+    height: 1px;
+    background: #B3B3B3;
+    margin: 38px 0 29px 0;
+}
+
+/* Buttons */
+.btn-add-photo,
+.btn-validate {
+    background: #1D6154;
+    color: white;
+    border: none;
+    padding: 10px 49px;
+    border-radius: 60px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin: 0 auto;
+    transition: background 0.2s ease;
+}
+
+.btn-add-photo:hover,
+.btn-validate:not(:disabled):hover {
+    background: #0E4D3A;
+}
+
+.btn-validate:disabled {
+    background: #A7A7A7;
+    cursor: not-allowed;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 10px;
+        padding: 20px;
+        max-width: 95%;
+    }
+    
+    .modal-gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+    
+    .modal h2 {
+        font-size: 22px;
+    }
+    
+    .upload-area {
+        padding: 30px 20px;
+    }
+    
+    .upload-icon {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 5px;
+        padding: 15px;
+    }
+    
+    .modal-gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .modal-header {
+        margin-bottom: 20px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 12px;
+    }
+}
+
+/* ================================
+   ACCESSIBILITY
+   ================================ */
+
+/* Focus visible pour l'accessibilité */
+.modal button:focus-visible,
+.modal input:focus-visible,
+.modal select:focus-visible {
+    outline: 2px solid #1D6154;
+    outline-offset: 2px;
+}
+
+/* Améliorer la visibilité des éléments interactifs */
+@media (prefers-reduced-motion: no-preference) {
+    .modal {
+        transition: opacity 0.3s ease;
+    }
+    
+    .modal-content {
+        transition: transform 0.3s ease;
+    }
+}
+
+/* Pour les utilisateurs qui préfèrent les mouvements réduits */
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal-content,
+    .close,
+    .back-btn,
+    .btn-choose-file,
+    .btn-add-photo,
+    .btn-validate,
+    .delete-work-btn {
+        transition: none;
+    }
+}

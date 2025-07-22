@@ -1,0 +1,45 @@
+<div class="modal" id="modal-add-photo" aria-hidden="true" aria-labelledby="add-photo-title">
+    <div class="modal-content">
+        <div class="modal-nav">
+            <nav>   
+                <button class="back-btn" id="back-to-gallery" aria-label="Retour à la galerie">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </button>
+                <button class="close-btn" id="btn-close-gallery" aria-label="Fermer la galerie">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>    
+            </nav>
+        </div>
+        <div class="modal-title">
+            <h2 id="add-photo-title">Ajout photo</h2>
+        </div>
+        <form id="add-photo-form" enctype="multipart/form-data">
+            <div class="photo-upload-zone">
+                <div class="upload-area" id="upload-area">
+                    <i class="fa-regular fa-image upload-icon"></i>
+                    <button type="button" class="btn-choose-file">+ Ajouter photo</button>
+                    <p class="upload-info">jpg, png : 4mo max</p>
+                </div>
+                <input type="file" id="photo-input" name="image" accept="image/jpeg,image/png" style="display: none;">
+                <div class="image-preview" id="image-preview" style="display: none;">
+                    <img id="preview-img" src="" alt="Prévisualisation">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="title-input">Titre</label>
+                <input type="text" id="title-input" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="category-select">Catégorie</label>
+                <select id="category-select" name="category" required>
+                    <option value=""></option>
+                </select>
+            </div>
+            
+            <hr class="modal-divider">
+            <button type="submit" class="btn-validate" disabled>Valider</button>
+        </form>
+    </div>
+</div>

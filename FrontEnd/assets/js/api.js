@@ -20,9 +20,36 @@ const apiCACHE = {
         refreshTime: 5 * 60 * 1000, // 5 minutes
     },
     auth: {
-        token: null,
-        userId: null,
-        timestamp: null,
+        get token() {
+            return localStorage.getItem('auth_token');
+        },
+        set token(value) {
+            if (value) {
+                localStorage.setItem('auth_token', value);
+            } else {
+                localStorage.removeItem('auth_token');
+            }
+        },
+        get userId() {
+            return localStorage.getItem('auth_userId');
+        },
+        set userId(value) {
+            if (value) {
+                localStorage.setItem('auth_userId', value);
+            } else {
+                localStorage.removeItem('auth_userId');
+            }
+        },
+        get timestamp() {
+            return localStorage.getItem('auth_timestamp');
+        },
+        set timestamp(value) {
+            if (value) {
+                localStorage.setItem('auth_timestamp', value);
+            } else {
+                localStorage.removeItem('auth_timestamp');
+            }
+        },
         refreshTime: 120 * 60 * 1000, // 120 minutes
     }
 };
@@ -38,12 +65,26 @@ const apiERRORS = {
 
 const apiURL = "http://localhost:5678/api";
 
+/** Vérifier si l'utilisateur est authentifié */
+function isAuthenticated() {
+    return isCacheValid(apiCACHE.auth);
+}
+
+/** Déconnecter l'utilisateur */
+function logout() {
+    apiCACHE.auth.token = null;
+    apiCACHE.auth.userId = null;
+    apiCACHE.auth.timestamp = null;
+}
 
 /** Utilitaire pour verifier la validité du cache */
 function isCacheValid(cache) {
+    if (cache === apiCACHE.auth) {
+        const timestamp = parseInt(cache.timestamp);
+        return cache.token && timestamp && (Date.now() < timestamp + cache.refreshTime);
+    }
     return cache.data && (Date.now() < cache.timestamp + cache.refreshTime);
 }
-
 
 /** FETCH GET */
 async function fetchWorks() {
@@ -133,19 +174,36 @@ async function postWork(workData) {
         if (!apiCACHE.auth.token) {
             throw new Error("Utilisateur non authentifié");
         }
+        
         console.log("Envoi des données de l'œuvre à l'API");
+        
+        const headers = {
+            'Authorization': `Bearer ${apiCACHE.auth.token}`
+        };
+        
+        // Si c'est un FormData, ne pas définir Content-Type (laissé automatique pour multipart)
+        if (!(workData instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+            workData = JSON.stringify(workData);
+        }
+        
         const response = await fetch(`${apiURL}/works`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiCACHE.auth.token}`,
-            },
-            body: JSON.stringify(workData),
+            headers: headers,
+            body: workData,
         });
+        
         if (!response.ok) {
             throw new Error(apiERRORS[response.status] || "Erreur inconnue");
         }
+        
         const data = await response.json();
+        
+        // Mettre à jour le cache des œuvres
+        if (apiCACHE.works.data) {
+            apiCACHE.works.data.push(data);
+        }
+        
         return data;
     } catch (error) {
         console.error("Erreur lors de l'envoi de l'œuvre :", error);
@@ -160,20 +218,37 @@ async function deleteWork(workId) {
         if (!apiCACHE.auth.token) {
             throw new Error("Utilisateur non authentifié");
         }
+        
         console.log(`Suppression de l'œuvre avec l'ID ${workId}`);
+        console.log(`Token disponible: ${apiCACHE.auth.token ? 'Oui' : 'Non'}`);
+        console.log(`URL de l'appel: ${apiURL}/works/${workId}`);
+        
         const response = await fetch(`${apiURL}/works/${workId}`, {
             method: 'DELETE',
             headers: {
+                'accept': `*/*`,
                 'Authorization': `Bearer ${apiCACHE.auth.token}`,
             },
         });
+        
+        console.log(`Status de la réponse: ${response.status}`);
+        console.log(`Response OK: ${response.ok}`);
+        
+        // Essayer de lire le body de la réponse pour plus d'infos
+        const responseText = await response.text();
+        console.log(`Body de la réponse: ${responseText}`);
+        
         if (!response.ok) {
-            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
+            throw new Error(`${response.status}: ${apiERRORS[response.status] || "Erreur inconnue"} - ${responseText}`);
         }
+        
         return { message: "Œuvre supprimée avec succès" };
     } catch (error) {
         console.error("Erreur lors de la suppression de l'œuvre :", error);
-        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
+        console.error("Type d'erreur:", typeof error);
+        console.error("Message d'erreur:", error.message);
+        console.error("Stack trace:", error.stack);
+        throw error; // Relancer l'erreur originale au lieu d'en créer une nouvelle
     }
 }
 
@@ -188,4 +263,4 @@ function getCategoriesNameList(categories){
     return categories.map(category => category.name)
 }
 
-export { fetchWorks, fetchCategories, postLogin, postWork, deleteWork, getCategoriesNameList, getWorkTitleList}
+export { fetchWorks, fetchCategories, postLogin, postWork, deleteWork, getCategoriesNameList, getWorkTitleList, isAuthenticated, logout}

@@ -118,7 +118,7 @@ class ModalManager {
         if (!this.currentModal) return;
         
         // Fermeture par bouton close
-        const closeBtn = this.currentModal.querySelector('.close');
+        const closeBtn = this.currentModal.querySelector('.close-btn');
         closeBtn?.addEventListener('click', () => this.closeModal());
         
         // Fermeture par clic sur le fond
@@ -185,9 +185,9 @@ const openGalleryModal = async function(e) {
     });
 }
 
-//  Ouverture de la modal ajout photo
+//  Ouverture de la modal ajout de travail
 const openAddPhotoModal = async function() {
-    await modalManager.openModal('modal-add-photo', async (modal) => {
+    await modalManager.openModal('modal-add-work', async (modal) => {
         // S'assurer que les données sont chargées
         if (categories.length === 0) {
             await initializeData();
@@ -284,11 +284,19 @@ async function handleDeleteWork(e) {
     const workId = parseInt(e.currentTarget.dataset.id);
     const work = works.find(w => w.id === workId);
     
-    if (!work) return;
+    console.log(`Tentative de suppression - ID: ${workId}, Work trouvé:`, work);
+    
+    if (!work) {
+        console.error("Œuvre non trouvée dans le cache local");
+        return;
+    }
     
     if (confirm(`Êtes-vous sûr de vouloir supprimer "${work.title}" ?`)) {
         try {
-            await deleteWork(workId);
+            console.log(`Suppression de l'œuvre ID ${workId}`);
+            const result = await deleteWork(workId);
+            console.log("Résultat de la suppression:", result);
+            
             works = works.filter(w => w.id !== workId);
             
             // Recharger la galerie dans la modal actuelle
@@ -301,11 +309,12 @@ async function handleDeleteWork(e) {
             
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
-            alert('Erreur lors de la suppression de l\'œuvre');
+            console.error('Type d\'erreur:', typeof error);
+            console.error('Message:', error.message);
+            alert(`Erreur lors de la suppression de l'œuvre: ${error.message}`);
         }
     }
 }
-
 // Initialiser les données au chargement
 initializeData();
 

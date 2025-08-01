@@ -1,7 +1,9 @@
 import { fetchWorks, fetchCategories, postLogin, postWork, deleteWork, getCategoriesNameList, getWorkTitleList } from './api.js';
 import { checkAdminMode } from './admin.js';
 
-
+// Variables globales pour stocker les données
+let globalWorks = [];
+let globalCategories = [];
 
 function generateWorks(works) {
     const gallery = document.querySelector('.gallery');
@@ -74,7 +76,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }   
 
         checkAdminMode();
-    
+        // Écouter les événements de suppression et d'ajout d'œuvres
+        document.addEventListener('workDeleted', handleWorkDeleted);
+        document.addEventListener('workAdded', handleWorkAdded);
 
     } catch (error) {
         console.error('Erreur:', error);
@@ -83,3 +87,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
+// Fonction pour gérer l'ajout d'une nouvelle œuvre
+function handleWorkAdded(event) {
+    const { work } = event.detail;
+    console.log(`Nouvelle œuvre ajoutée détectée:`, work);
+    
+    // Ajouter la nouvelle œuvre au cache local
+    globalWorks.push(work);
+    
+    // Recharger la galerie
+    const activeFilter = document.querySelector('.filters .active');
+    const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : '*';
+    
+    const filteredWorks = globalWorks.filter(w => 
+        currentFilter === '*' || w.category.name === currentFilter.slice(1)
+    );
+    
+    generateWorks(filteredWorks);
+    
+    console.log(`Galerie principale mise à jour. ${globalWorks.length} œuvres au total.`);
+}
+
+// Fonction pour gérer la suppression d'une œuvre
+function handleWorkDeleted(event) {
+    const { workId } = event.detail;
+    console.log(`Œuvre supprimée détectée - ID: ${workId}`);
+    
+    // Supprimer l'œuvre du cache local
+    globalWorks = globalWorks.filter(work => work.id !== workId);
+    
+    // Recharger la galerie avec les œuvres restantes
+    const activeFilter = document.querySelector('.filters .active');
+    const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : '*';
+    
+    const filteredWorks = globalWorks.filter(work => 
+        currentFilter === '*' || work.category.name === currentFilter.slice(1)
+    );
+    
+    generateWorks(filteredWorks);
+    
+    console.log(`Galerie principale mise à jour. ${globalWorks.length} œuvres restantes.`);
+}

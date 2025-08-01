@@ -1,12 +1,12 @@
-import { isLoggedIn } from "./login.js";   
-import { openModal } from "./modal.js";
+import { isAuthenticated, logout } from "./api.js";   
+import { openGalleryModal } from "./modal/gallery-modal.js";
 
 const loginLink = document.getElementById('login-link');
 
 // ***************** Mode Administrateur *****************
 
 function checkAdminMode() {
-    if (isLoggedIn()) {
+    if (isAuthenticated()) {
         enableAdminMode();
         updateLoginLink();
         console.log("Mode administrateur activé.");
@@ -60,7 +60,7 @@ function createAdminBanner() {
             <span>Mode édition</span>
         </div>
     `;
-    banner.addEventListener('click', openModal);
+    banner.addEventListener('click', openGalleryModal);
     document.body.insertBefore(banner, document.body.firstChild);
 }
 
@@ -71,7 +71,7 @@ function addEditButtons() {
         const editBtn = document.createElement('button');
         editBtn.className = 'edit-btn';
         editBtn.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> modifier';
-        editBtn.addEventListener('click', openModal);
+        editBtn.addEventListener('click', openGalleryModal);
         
         const editContainer = document.createElement('div');
         editContainer.className = 'title-edit-container';
@@ -87,21 +87,21 @@ function updateLoginLink() {
     if (loginLink) {
         loginLink.textContent = 'logout';
         loginLink.href = '#';
-        loginLink.addEventListener('click', logout);
+        loginLink.addEventListener('click', logout_reload);
     }
 }
-function logout() {
-    localStorage.removeItem('login');
+function logout_reload() {
+    logout(); // Appel de la fonction logout pour effacer les données d'authentification
     disableAdminMode();
     loginLink.textContent = 'login';
     location.reload();
-    console.log(isLoggedIn);
+    console.log(isAuthenticated);
 }
 
 // ***************** Événement login link modifié *****************
 loginLink.addEventListener('click', async () => {
     // Si déjà connecté, ne pas rediriger
-    if (isLoggedIn) {
+    if (isAuthenticated) {
         return; // Le logout est géré par updateLoginLink()
     } else {
         console.log('Aucune donnée de connexion trouvée, redirection vers la page de connexion.');

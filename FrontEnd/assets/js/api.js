@@ -1,198 +1,191 @@
-// Configuration du cache
-const CACHE_CONFIG = {
-    WORKS_KEY: 'cached_works',
-    CATEGORIES_KEY: 'cached_categories',
-    EXPIRY_TIME: 5 * 60 * 1000 // 5 minutes
+/**
+ * Ce scripts javascript est utilisé pour gérér les appels API du backend. A l'aide de la documentation disponiible depuis le swagger http://localhost:5678/api-docs
+ * Tout d'abord on va mettre en place la gestion du cache à l'aide de la librairie local storage pour éviter de faire des appels API inutiles.
+ * Ensuite on va créer des fonctions pour chaque appel API nécessaire à l'application en découpant les appels par type (GET, POST, DELETE).
+ * Mettre en place une structure pour la gestion des erreurs et des réponses.
+ * Pour finir des fonctions getMonObjetUtilitaire avec une fonction lambda pour le mapping des données.
+ */
+
+
+/** Gestion du cache des données API */
+const apiCACHE = {
+    works: {
+        data: null,
+        timestamp: null,
+        refreshTime: 5 * 60 * 1000, // 5 minutes
+    },
+    categories: {
+        data: null,
+        timestamp: null,
+        refreshTime: 5 * 60 * 1000, // 5 minutes
+    },
+    auth: {
+        token: null,
+        userId: null,
+        timestamp: null,
+        refreshTime: 120 * 60 * 1000, // 120 minutes
+    }
+};
+
+/** Structure de gestion des messages erreurs des Response.status */
+const apiERRORS = {
+    400: "Requête invalide",
+    401: "Non autorisé",
+    404: "Ressource non trouvée",
+    500: "Erreur interne du serveur",
+};
+
+
+const apiURL = "http://localhost:5678/api";
+
+
+/** Utilitaire pour verifier la validité du cache */
+function isCacheValid(cache) {
+    return cache.data && (Date.now() < cache.timestamp + cache.refreshTime);
 }
 
-// ***************** Utilitaires de cache *****************
-function getCachedData(key) {
+
+/** FETCH GET */
+async function fetchWorks() {
     try {
-        const cached = localStorage.getItem(key);
-        if (!cached) return null;
-        
-        const data = JSON.parse(cached);
-        const now = new Date().getTime();
-        
-        // Vérifier si les données ont expiré
-        if (now - data.timestamp > CACHE_CONFIG.EXPIRY_TIME) {
-            localStorage.removeItem(key);
-            return null;
+        if (isCacheValid(apiCACHE.works)) {
+            console.log("Utilisation du cache pour récupérer les œuvres");
+            return apiCACHE.works.data;
         }
-        
-        console.log(`Données récupérées du cache: ${key}`);
-        return data.content;
-    } catch (error) {
-        console.error('Erreur lors de la lecture du cache:', error);
-        localStorage.removeItem(key);
-        return null;
-    }
-}
-
-function setCachedData(key, data) {
-    try {
-        const cacheObject = {
-            content: data,
-            timestamp: new Date().getTime()
-        };
-        localStorage.setItem(key, JSON.stringify(cacheObject));
-        console.log(`Données sauvegardées en cache: ${key}`);
-    } catch (error) {
-        console.error('Erreur lors de la sauvegarde en cache:', error);
-    }
-}
-
-function invalidateCache() {
-    localStorage.removeItem(CACHE_CONFIG.WORKS_KEY);
-    localStorage.removeItem(CACHE_CONFIG.CATEGORIES_KEY);
-    console.log('Cache invalidé');
-}
-
-// ***************** GET request to fetch works and categories *****************
-async function getCategories() {
-    // 1. Vérifier le cache d'abord
-    const cachedCategories = getCachedData(CACHE_CONFIG.CATEGORIES_KEY);
-    if (cachedCategories) {
-        return cachedCategories;
-    }
-
-    // 2. Si pas en cache, faire la requête API
-    try {
-        console.log('Récupération des catégories depuis l\'API...');
-        const response = await fetch('http://localhost:5678/api/categories', {
-            method: 'GET',
-            headers: {
-                'accept': 'application/json'
-            }
-        });
-        
+        console.log("Récupération des œuvres depuis l'API");
+        const response = await fetch(`${apiURL}/works`);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
         }
-        
         const data = await response.json();
-        console.log(data);
-        
-        // 3. Sauvegarder en cache
-        setCachedData(CACHE_CONFIG.CATEGORIES_KEY, data);
-        
+        // Mise à jour du cache
+        apiCACHE.works.data = data;
+        apiCACHE.works.timestamp = Date.now();
         return data;
     } catch (error) {
-        console.error('Erreur api/categories:', error);
-        throw error;
+        console.error("Erreur lors de la récupération des œuvres :", error);
+        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
     }
 }
 
-async function getWorkData() {
-    // 1. Vérifier le cache d'abord
-    const cachedWorks = getCachedData(CACHE_CONFIG.WORKS_KEY);
-    if (cachedWorks) {
-        return cachedWorks;
-    }
-
-    // 2. Si pas en cache, faire la requête API
+async function fetchCategories() {
     try {
-        console.log('Récupération des works depuis l\'API...');
-        const response = await fetch('http://localhost:5678/api/works', {
-            method: 'GET',
-            headers: {
-                'accept': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (isCacheValid(apiCACHE.categories)) {
+            console.log("Utilisation du cache pour récupérer les catégories");
+            return apiCACHE.categories.data;
         }
-        
+        console.log("Récupération des catégories depuis l'API");
+        const response = await fetch(`${apiURL}/categories`);
+        if (!response.ok) {
+            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
+        }
         const data = await response.json();
-        console.log(data);
-        
-        // 3. Sauvegarder en cache
-        setCachedData(CACHE_CONFIG.WORKS_KEY, data);
-        
+        // Mise à jour du cache
+        apiCACHE.categories.data = data;
+        apiCACHE.categories.timestamp = Date.now();
         return data;
     } catch (error) {
-        console.error('Erreur api/works:', error);
-        throw error;
+        console.error("Erreur lors de la récupération des catégories :", error);
+        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
     }
 }
 
-
-
-// ***************** POST request to fetch login and new works *****************
+/** FETCH POST */
 async function postLogin(credentials) {
     try {
-        const response = await fetch('http://localhost:5678/api/users/login', {
+        // Vérification du cache d'authentification
+        if (isCacheValid(apiCACHE.auth)) {
+            console.log("Utilisation du cache pour la connexion");
+            return {
+                token: apiCACHE.auth.token,
+                userId: apiCACHE.auth.userId
+            };
+        }
+        console.log("Connexion à l'API avec les identifiants fournis");
+        // Vérification des identifiants
+        if (!credentials || !credentials.email || !credentials.password) {
+            throw new Error("Identifiants manquants");
+        }
+        const response = await fetch(`${apiURL}/users/login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(credentials)
+            body: JSON.stringify(credentials),
         });
-        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
         }
-        
         const data = await response.json();
-        console.log(data);
+        // Mise à jour du cache d'authentification
+        apiCACHE.auth.token = data.token;
+        apiCACHE.auth.userId = data.userId;
+        apiCACHE.auth.timestamp = Date.now();
         return data;
     } catch (error) {
-        console.error('Erreur api/users/login:', error);
-        throw error;
+        console.error("Erreur lors de la connexion :", error);
+        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
     }
 }
-
-async function postNewWork(workData) {
+async function postWork(workData) {
     try {
-        const response = await fetch('http://localhost:5678/api/works', { // Correction: 'workss' -> 'works'
+        // Vérification du cache d'authentification
+        if (!apiCACHE.auth.token) {
+            throw new Error("Utilisateur non authentifié");
+        }
+        console.log("Envoi des données de l'œuvre à l'API");
+        const response = await fetch(`${apiURL}/works`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiCACHE.auth.token}`,
             },
-            body: JSON.stringify(workData)
+            body: JSON.stringify(workData),
         });
-        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
         }
-        
         const data = await response.json();
-        console.log(data);
-        
-        // IMPORTANT: Invalider le cache après ajout
-        invalidateCache();
-        
         return data;
     } catch (error) {
-        console.error('Erreur api/works:', error);
-        throw error;
+        console.error("Erreur lors de l'envoi de l'œuvre :", error);
+        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
     }
 }
 
-// ***************** DELETE request to fetch old works *****************
+/** FETCH DELETE */
 async function deleteWork(workId) {
     try {
-        const response = await fetch(`http://localhost:5678/api/works/${workId}`, {
+        // Vérification du cache d'authentification
+        if (!apiCACHE.auth.token) {
+            throw new Error("Utilisateur non authentifié");
+        }
+        console.log(`Suppression de l'œuvre avec l'ID ${workId}`);
+        const response = await fetch(`${apiURL}/works/${workId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': '*/*'
-            }
+                'Authorization': `Bearer ${apiCACHE.auth.token}`,
+            },
         });
-        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(apiERRORS[response.status] || "Erreur inconnue");
         }
-        
-        console.log(`Work with ID ${workId} deleted successfully.`);
-        
-        // IMPORTANT: Invalider le cache après suppression
-        invalidateCache();
-        
+        return { message: "Œuvre supprimée avec succès" };
     } catch (error) {
-        console.error('Erreur api/works:', error);
-        throw error;
+        console.error("Erreur lors de la suppression de l'œuvre :", error);
+        throw new Error(apiERRORS[error.status] || "Erreur inconnue");
     }
 }
 
-export { getCategories, getWorkData, postLogin, postNewWork, deleteWork }; // Export functions for use in other modules
+
+
+/** Utilitaire fonction lambda pour le tri et le filtrage des œuvres */
+function getWorkTitleList(works) {
+    return works.map(work => work.title);
+}
+
+function getCategoriesNameList(categories){
+    return categories.map(category => category.name)
+}
+
+export { fetchWorks, fetchCategories, postLogin, postWork, deleteWork, getCategoriesNameList, getWorkTitleList}

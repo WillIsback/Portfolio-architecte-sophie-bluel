@@ -3,31 +3,44 @@
    ================================ */
 
 .admin-banner {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 1440px;
 	height: 59px;
-	background-color: #000000;
-	color: white;
-	padding: 10px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	z-index: 1000;
+	flex-shrink: 0;
+	background: #000;
 }
 
 .admin-banner-content {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
+	display: inline-flex;
 	justify-content: center;
-	gap: 10px;
-	margin-top: 20px;
-	cursor: pointer;
+	align-items: center;
+	color: white;
+	gap: 11.42px;
 }
-
+.admin-banner-content .fa-pen-to-square {
+	font-size: 15.58px;
+}
+.admin-banner-content span {
+	text-align: center;
+	font-family: "Work Sans";
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+}
 /* Adjust body when admin banner is present */
 body:has(.admin-banner) {
-    padding-top: 59px;
+	header {
+		margin-top: 38px; /* Adjusted to account for the admin banner height */
+	}
+    #introduction {
+		margin-top: 92px; /* Adjusted to account for the admin banner height */
+	}
+	#portfolio {
+		gap: 92px; /* Adjusted to account for the admin banner height */
+	}
 }
 
 .title-edit-container {
@@ -39,11 +52,13 @@ body:has(.admin-banner) {
 }
 
 .edit-btn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	cursor: pointer;
 	background-color: transparent;
 	color: #000000;
 	border: none;
-	padding-bottom: 30px;
 	display: flex;
 	align-items: center;
 	gap: 8px;

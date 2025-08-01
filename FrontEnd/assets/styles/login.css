@@ -2,34 +2,19 @@
    LOGIN PAGE STYLES
    ================================ */
 
-.page-login {
-	max-width: 1440px;
-	max-height: 1024px;
+.login-main-container {
+	min-width: 1140px;
+	margin: 0 auto;
 }
 
-.header-login {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 1140px;
-	height: 42px;
-	margin-top: 50px;
-	margin-left: 150px;
-	margin-right: 150px;
-	box-sizing: border-box;
-}
-
-.header-login ul {
-	gap: 30px;
-}
-
+/*** login container styles ***/
 .login-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	gap : 30px;
-	margin-top: 200px;
+	margin-top: 150px;
 }
 
 .login-container form {
@@ -72,23 +57,8 @@
 }
 
 .login-container p {
+	margin-top: 37px;
 	text-decoration: underline;
-}
-
-.footer-login {
-	position: fixed;
-	bottom: 0;
-	right: 0;
-	width: auto;
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	padding: 20px;
-}
-
-.footer-login li {	
-	font: 14px 'Work Sans', light;
-	font-weight: 300;
 }
 
 /* Error Messages */

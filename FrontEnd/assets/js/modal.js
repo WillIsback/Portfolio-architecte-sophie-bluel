@@ -1,4 +1,4 @@
-import { getWorkData, getCategories, deleteWork, postNewWork } from './api.js';
+import { fetchWorks, fetchCategories, deleteWork, postWork } from './api.js';
 
 let works = [];
 let categories = [];
@@ -157,8 +157,8 @@ const modalManager = new ModalManager();
 //  Initialisation des données
 async function initializeData() {
     try {
-        works = await getWorkData();
-        categories = await getCategories();
+        works = await fetchWorks();
+        categories = await fetchCategories();
         console.log('Données initialisées:', { works, categories });
     } catch (error) {
         console.error('Erreur lors de l\'initialisation:', error);

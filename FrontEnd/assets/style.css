@@ -68,7 +68,14 @@ body {
 	max-width: 1140px;
 	margin: 0 auto;
 }
+main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0px 95px;
+}
 
+/** header **/
 header {
 	display: flex;
 	justify-content: space-between;
@@ -77,13 +84,6 @@ header {
 	flex-shrink: 0;
 	margin-top: 50px;
 }
-main {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 0px 95px;
-}
-
 .logo {
 	display: flex;
 	width: 213px;
@@ -94,7 +94,6 @@ main {
 	gap: 4px;
 	flex-shrink: 0;
 }
-
 h1{
 	color: #B1663C;
 	text-align: center;
@@ -104,7 +103,6 @@ h1{
 	font-weight: 800;
 	line-height: normal;
 }
-
 .logo p {
 	color: #93532F;
 	text-align: center;
@@ -138,18 +136,15 @@ nav li {
 	font-weight: 400;
 	line-height: normal;
 }
-
 nav li a {
     text-decoration: none; 
     color: inherit;
 }
-
 nav ul li img {
 	width: 22px;
 	height: 22px;
 	flex-shrink: 0;
 }
-
 li:hover {
 	color: #000;
 	text-align: center;
@@ -159,8 +154,6 @@ li:hover {
 	font-weight: 700;
 	line-height: normal;
 }
-
-
 h2{
 	font-family: 'Syne';
 	font-weight: 700;
@@ -336,6 +329,7 @@ figure figcaption {
 	background: #FFF;
 	box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.09);
 	border: none;
+	font-size: 18px;
 }
 .message-form {
 	display: flex;

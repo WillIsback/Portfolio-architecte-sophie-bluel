@@ -1,4 +1,4 @@
-import { getWorkData, getCategories, postLogin, postNewWork, deleteWork } from './api.js';
+import { fetchWorks, fetchCategories, postLogin, postWork, deleteWork, getCategoriesNameList, getWorkTitleList } from './api.js';
 import { checkAdminMode } from './admin.js';
 
 
@@ -64,11 +64,11 @@ function generateCategoriesFilters(categories, works) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try{
-        const works = await getWorkData();
+        const works = await fetchWorks();
         if (works) {
         generateWorks(works);
         }
-        const categories = await getCategories();
+        const categories = await fetchCategories();
         if (categories) {
         generateCategoriesFilters(categories, works);
         }   

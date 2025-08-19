@@ -7,9 +7,9 @@
    ================================ */
 
 /* Import des styles spécialisés */
-@import url('./styles/login.css');
-@import url('./styles/admin.css');
-@import url('./styles/modal.css');
+@import url('./components/login.css');
+@import url('./components/admin.css');
+@import url('./components/modal.css');
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -137,7 +137,7 @@ nav li {
 	line-height: normal;
 }
 nav li a {
-    text-decoration: none; 
+    text-decoration: none;
     color: inherit;
 }
 nav ul li img {
@@ -219,7 +219,7 @@ h2{
 	gap: 10px;
 }
 
-.filters li {
+.filters .filter-btn {
 	display: flex;
 	height: 37px;
 	cursor: pointer;
@@ -237,11 +237,11 @@ h2{
 
 }
 
-.filters li:hover {
+.filters .filter-btn:hover {
   background: #ccc;
 }
 
-.filters li.active {
+.filters .filter-btn.active {
   background: #1D6154;
   color: white;
 }
@@ -342,7 +342,7 @@ figure figcaption {
 	font-style: normal;
 	font-weight: 500;
 	line-height: normal;
-	margin-bottom: 11px;	
+	margin-bottom: 11px;
 }
 .message-form textarea {
 	width: 379px;

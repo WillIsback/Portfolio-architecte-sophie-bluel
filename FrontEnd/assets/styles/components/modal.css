@@ -1,28 +1,30 @@
 /* ================================
-   MODAL STYLES
+   WEB COMPONENTS MODAL STYLES
    ================================ */
 
-/* Base Modal */
-.modal {
+/* Base Modal pour Web Components */
+:host(.modal-overlay) {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
     opacity: 0;
-    transition: opacity 0.3s ease; /* animation sur l'opacité du background */
+    visibility: hidden;
+    transition: opacity 0.3s ease;
 }
 
-.modal[aria-modal="true"] {
+:host(.modal-overlay[open]) {
     opacity: 1;
+    visibility: visible;
 }
 
-.modal-content {
+.modal-container {
     background: white;
     border-radius: 10px;
     max-width: 630px;
@@ -35,36 +37,40 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
 }
 
-.modal-content nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 25px;
-}
-
-/* Gestion d'animation d'apparition du modal*/
-.modal[aria-modal="true"] .modal-content {
+:host(.modal-overlay[open]) .modal-container {
     transform: translateY(0);
 }
 
-/* Modal Header */
-.modal-title{
+/* Header unifié */
+.modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 25px;
     margin-bottom: 30px;
+    position: relative;
 }
 
-.modal h2 {
+.modal-title {
     text-align: center;
     margin: 0;
     font-family: 'Work Sans', sans-serif;
     font-size: 26px;
     font-weight: 400;
     color: #000;
+    flex: 1;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.close-btn,
-.back-btn {
+.btn-back,
+.close-btn {
     background: none;
     border: none;
     font-size: 20px;
@@ -72,37 +78,50 @@
     padding: 5px;
     color: #000;
     transition: color 0.2s ease;
+    z-index: 1;
 }
 
-.close-btn,
-.back-btn:hover {
+.btn-back {
+    align-self: flex-start;
+}
+
+.close-btn {
+    align-self: flex-end;
+}
+
+.btn-back:hover,
+.close-btn:hover {
     color: #666;
 }
 
-.close-btn,
-.back-btn i {
+.btn-back i,
+.close-btn i {
     width: 24px;
     height: 24px;
 }
 
+/* Gestion de l'affichage du bouton retour selon le type de modal */
+:host(.gallery-modal) .btn-back {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+:host(.add-work-modal) .btn-back {
+    visibility: visible;
+    pointer-events: auto;
+}
 /* ================================
    MODAL GALLERY STYLES
    ================================ */
 
-/* Masquage du bouton de retour dans la galerie */ 
-#modal-gallery .back-btn {
-    visibility : hidden;
-    pointer-events: none;
-}
-
-.modal-gallery-grid {
+.gallery-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
     margin-bottom: 47px;
 }
 
-.modal-work-item {
+.work-item {
     position: relative;
 }
 
@@ -118,7 +137,7 @@
     border-radius: 4px;
 }
 
-.delete-work-btn {
+.delete-btn {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -136,8 +155,18 @@
     transition: background 0.2s ease;
 }
 
-.delete-work-btn:hover {
+.delete-btn:hover {
     background: #666;
+}
+
+.work-title {
+    margin: 5px 0 0 0;
+    font-size: 12px;
+    text-align: left;
+    color: #000;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.2;
 }
 
 .no-works {
@@ -146,13 +175,14 @@
     font-style: italic;
     grid-column: 1 / -1;
     padding: 40px 20px;
+    font-size: 16px;
 }
 
 /* ================================
    MODAL ADD PHOTO STYLES
    ================================ */
 
-.photo-upload-zone {
+.upload-section {
     margin-bottom: 30px;
 }
 
@@ -164,6 +194,11 @@
     cursor: pointer;
     background: #E8F0FE;
     transition: border-color 0.3s ease, background-color 0.3s ease;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .upload-area:hover {
@@ -185,6 +220,7 @@
 
 .btn-choose-file {
     background: #CBD6DC;
+    color: #306685;
     border: none;
     padding: 10px 30px;
     border-radius: 50px;
@@ -208,6 +244,14 @@
 .image-preview {
     text-align: center;
     padding: 20px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .image-preview img {
@@ -228,6 +272,7 @@
     font-weight: 500;
     font-family: 'Work Sans', sans-serif;
     color: #3D3D3D;
+    font-size: 14px;
 }
 
 .form-group input,
@@ -241,6 +286,7 @@
     font-family: 'Work Sans', sans-serif;
     border-radius: 3px;
     transition: box-shadow 0.2s ease;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -250,7 +296,7 @@
 }
 
 /* Divider */
-.modal-divider {
+.separator {
     border: none;
     height: 1px;
     background: #B3B3B3;
@@ -258,7 +304,7 @@
 }
 
 /* Buttons */
-.btn-add-photo,
+.btn-primary,
 .btn-validate {
     background: #1D6154;
     color: white;
@@ -272,16 +318,67 @@
     display: block;
     margin: 0 auto;
     transition: background 0.2s ease;
+    width: auto;
+    height: auto;
 }
 
-.btn-add-photo:hover,
+.btn-primary:hover,
 .btn-validate:not(:disabled):hover {
     background: #0E4D3A;
 }
 
-.btn-validate:disabled {
+.btn-validate:disabled,
+.btn-validate.disabled {
     background: #A7A7A7;
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-validate.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-validate.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* États d'erreur pour les champs de formulaire */
+.form-group.error input,
+.form-group.error select {
+    border-color: #dc3545;
+    box-shadow: 0px 4px 14px rgba(220, 53, 69, 0.3);
+}
+
+.form-group.success input,
+.form-group.success select {
+    border-color: #28a745;
+    box-shadow: 0px 4px 14px rgba(40, 167, 69, 0.3);
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
 }
 
 /* ================================
@@ -289,44 +386,44 @@
    ================================ */
 
 @media (max-width: 768px) {
-    .modal-content {
+    .modal-container {
         margin: 10px;
         padding: 20px;
         max-width: 95%;
     }
-    
-    .modal-gallery-grid {
+
+    .gallery-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 4px;
     }
-    
-    .modal h2 {
+
+    .modal-title {
         font-size: 22px;
     }
-    
+
     .upload-area {
         padding: 30px 20px;
     }
-    
+
     .upload-icon {
         font-size: 48px;
     }
 }
 
 @media (max-width: 480px) {
-    .modal-content {
+    .modal-container {
         margin: 5px;
         padding: 15px;
     }
-    
-    .modal-gallery-grid {
+
+    .gallery-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .modal-header {
         margin-bottom: 20px;
     }
-    
+
     .form-group input,
     .form-group select {
         padding: 12px;
@@ -334,38 +431,68 @@
 }
 
 /* ================================
+   LOADING STATES
+   ================================ */
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #1D6154;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ================================
    ACCESSIBILITY
    ================================ */
 
-/* Focus visible pour l'accessibilité */
-.modal button:focus-visible,
-.modal input:focus-visible,
-.modal select:focus-visible {
+.close-btn:focus-visible,
+.btn-back:focus-visible,
+.btn-choose-file:focus-visible,
+.btn-primary:focus-visible,
+.btn-validate:focus-visible,
+.delete-btn:focus-visible,
+.form-group input:focus-visible,
+.form-group select:focus-visible {
     outline: 2px solid #1D6154;
     outline-offset: 2px;
 }
 
-/* Améliorer la visibilité des éléments interactifs */
 @media (prefers-reduced-motion: no-preference) {
-    .modal {
+    :host(.modal-overlay) {
         transition: opacity 0.3s ease;
     }
-    
-    .modal-content {
+
+    .modal-container {
         transition: transform 0.3s ease;
     }
 }
 
-/* Pour les utilisateurs qui préfèrent les mouvements réduits */
 @media (prefers-reduced-motion: reduce) {
-    .modal,
-    .modal-content,
-    .close,
-    .back-btn,
+    :host(.modal-overlay),
+    .modal-container,
+    .close-btn,
+    .btn-back,
     .btn-choose-file,
-    .btn-add-photo,
+    .btn-primary,
     .btn-validate,
-    .delete-work-btn {
+    .delete-btn {
         transition: none;
     }
 }

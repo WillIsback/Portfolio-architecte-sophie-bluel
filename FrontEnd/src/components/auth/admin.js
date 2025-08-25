@@ -129,19 +129,6 @@ export class AdminManager extends EventTarget {
             this.editButtons.push(editButton);
         }
 
-        // Ajouter d'autres boutons d'edition si necessaire
-        const introSection = document.querySelector('#introduction');
-        if (introSection && !introSection.querySelector('.edit-btn')) {
-            const editButton = document.createElement('button');
-            editButton.className = 'edit-btn';
-            editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> modifier';
-
-            const article = introSection.querySelector('article');
-            if (article) {
-                article.appendChild(editButton);
-                this.editButtons.push(editButton);
-            }
-        }
     }
 
     removeEditButtons() {

@@ -41,6 +41,10 @@ body:has(.admin-banner) {
 	#portfolio {
 		gap: 92px; /* Adjusted to account for the admin banner height */
 	}
+	#portfolio h2 {
+		display: flex;
+		gap: 30px;
+	}
 }
 
 .title-edit-container {

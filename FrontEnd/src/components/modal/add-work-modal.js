@@ -263,31 +263,68 @@ export class AddWorkModal extends BaseModal {
 
         try {
             const formData = this.buildFormData();
+
+            console.log('Submitting work with data:', {
+                title: formData.get('title'),
+                category: formData.get('category'),
+                imageFile: formData.get('image')?.name
+            });
+
             const newWork = await apiService.addWork(formData);
 
-            if (this.callbacks.onAdd) {
-                await this.callbacks.onAdd(newWork);
+            console.log('Work added successfully:', newWork);
+
+            // Vérifier que le work a les propriétés attendues
+            if (!newWork || typeof newWork !== 'object') {
+                throw new Error('Réponse API invalide: work manquant');
             }
 
+            // Appeler le callback onAdd si défini
+            if (this.callbacks.onAdd) {
+                try {
+                    await this.callbacks.onAdd(newWork);
+                } catch (callbackError) {
+                    console.error('Callback onAdd error:', callbackError);
+                    // Continuer malgré l'erreur du callback
+                }
+            }
+
+            // Dispatche l'événement personnalisé
             this.dispatchEvent(new CustomEvent('work:added', {
                 detail: { work: newWork },
                 bubbles: true
             }));
 
+            // Fermer le modal avec un délai pour l'UX
             setTimeout(() => {
-                if (this.callbacks.onBack) {
-                    this.callbacks.onBack();
-                } else {
-                    this.close();
+                try {
+                    if (this.callbacks.onBack) {
+                        this.callbacks.onBack();
+                    } else {
+                        this.close();
+                    }
+                } catch (closeError) {
+                    console.error('Error closing modal:', closeError);
+                    this.close(); // Fallback
                 }
             }, 300);
 
-            console.log('Work added successfully:', newWork);
-
         } catch (error) {
             console.error('Failed to add work:', error);
-            const errorMessage = error.message || 'Erreur inconnue lors de l\'ajout';
+
+            // Gestion d'erreur plus détaillée
+            let errorMessage = 'Erreur inconnue lors de l\'ajout';
+
+            if (error.message) {
+                if (error.message.includes('Failed to add work:')) {
+                    errorMessage = error.message.replace('Failed to add work: ', '');
+                } else {
+                    errorMessage = error.message;
+                }
+            }
+
             alert(`Erreur lors de l'ajout: ${errorMessage}`);
+
         } finally {
             this.setLoadingState(false, submitBtn, originalText);
         }
@@ -297,14 +334,28 @@ export class AddWorkModal extends BaseModal {
         const titleInput = this.querySelector('#title-input');
         const categorySelect = this.querySelector('#category-select');
 
-        if (!this.selectedFile || !titleInput || !categorySelect) {
-            throw new Error('Données du formulaire incomplètes');
+        if (!this.selectedFile) {
+            throw new Error('Aucune image sélectionnée');
+        }
+
+        if (!titleInput || !titleInput.value.trim()) {
+            throw new Error('Titre manquant');
+        }
+
+        if (!categorySelect || !categorySelect.value) {
+            throw new Error('Catégorie manquante');
         }
 
         const formData = new FormData();
         formData.append('image', this.selectedFile);
         formData.append('title', titleInput.value.trim());
         formData.append('category', parseInt(categorySelect.value));
+
+        console.log('FormData created:', {
+            title: formData.get('title'),
+            category: formData.get('category'),
+            image: formData.get('image')?.name
+        });
 
         return formData;
     }

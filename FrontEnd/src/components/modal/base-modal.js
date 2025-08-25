@@ -21,6 +21,9 @@ export class BaseModal extends HTMLElement {
     }
 
     render() {
+        const background = document.createElement('div');
+        background.className = 'modal-background';
+
         const container = document.createElement('div');
         container.className = 'modal-container';
         container.innerHTML = `
@@ -36,20 +39,27 @@ export class BaseModal extends HTMLElement {
             </div>
         `;
 
-        this.shadowRoot.appendChild(container);
+        background.appendChild(container);
+        this.shadowRoot.appendChild(background);
     }
 
     setupEventListeners() {
         const closeBtn = this.shadowRoot.querySelector('.close-btn');
         const backBtn = this.shadowRoot.querySelector('.btn-back');
+        const modalContainer = this.shadowRoot.querySelector('.modal-container');
+        const modalBackground = this.shadowRoot.querySelector('.modal-background');
 
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.close());
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.close();
+            });
         }
 
         if (backBtn) {
             backBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 if (this.onBackClick) {
                     this.onBackClick();
                 } else {
@@ -58,17 +68,29 @@ export class BaseModal extends HTMLElement {
             });
         }
 
-        this.addEventListener('click', (e) => {
-            if (e.target === this) {
-                this.close();
-            }
-        });
+        // Empêcher la fermeture sur le contenu du modal
+        if (modalContainer) {
+            modalContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
 
-        document.addEventListener('keydown', (e) => {
+        // Fermer seulement en cliquant sur le background
+        if (modalBackground) {
+            modalBackground.addEventListener('click', (e) => {
+                if (e.target === modalBackground) {
+                    this.close();
+                }
+            });
+        }
+
+        // Event listener pour la touche Escape
+        this.escapeHandler = (e) => {
             if (e.key === 'Escape' && this.isOpen) {
                 this.close();
             }
-        });
+        };
+        document.addEventListener('keydown', this.escapeHandler);
     }
 
     setTitle(title) {

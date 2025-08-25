@@ -63,7 +63,11 @@ export class GalleryModal extends BaseModal {
         event.preventDefault();
         event.stopPropagation();
 
-        const workId = parseInt(event.currentTarget.dataset.id);
+        // Capturer les références DOM AVANT l'appel async
+        const deleteBtn = event.currentTarget;
+        const workElement = deleteBtn.closest('.work-item');
+        const workId = parseInt(deleteBtn.dataset.id);
+
         const work = this.works.find(w => w.id === workId);
 
         if (!work) {
@@ -75,31 +79,43 @@ export class GalleryModal extends BaseModal {
             return;
         }
 
-        const deleteBtn = event.currentTarget;
+        // Vérifier que les éléments DOM existent
+        if (!deleteBtn || !workElement) {
+            console.error('DOM elements not found for work:', workId);
+            return;
+        }
+
         deleteBtn.disabled = true;
+        deleteBtn.textContent = '...';
 
         try {
             await apiService.deleteWork(workId);
 
+            // Mettre à jour le tableau des works
             this.works = this.works.filter(w => w.id !== workId);
 
-            const workElement = event.currentTarget.closest('.work-item');
-            if (workElement) {
+            // Animation de suppression avec vérification
+            if (workElement && workElement.parentNode) {
+                workElement.style.transition = 'all 0.2s ease';
                 workElement.style.opacity = '0';
                 workElement.style.transform = 'scale(0.8)';
 
                 setTimeout(() => {
-                    workElement.remove();
+                    if (workElement && workElement.parentNode) {
+                        workElement.remove();
 
-                    if (this.works.length === 0) {
-                        const galleryGrid = this.querySelector('.gallery-grid');
-                        if (galleryGrid) {
-                            galleryGrid.innerHTML = '<p class="no-works">Aucune œuvre disponible</p>';
+                        // Vérifier s'il reste des oeuvres
+                        if (this.works.length === 0) {
+                            const galleryGrid = this.querySelector('.gallery-grid');
+                            if (galleryGrid) {
+                                galleryGrid.innerHTML = '<p class="no-works">Aucune œuvre disponible</p>';
+                            }
                         }
                     }
                 }, 200);
             }
 
+            // Callbacks et événements
             if (this.callbacks.onDelete) {
                 this.callbacks.onDelete(workId);
             }
@@ -113,9 +129,15 @@ export class GalleryModal extends BaseModal {
 
         } catch (error) {
             console.error('Failed to delete work:', error);
+
+            // Restaurer l'état du bouton en cas d'erreur
+            if (deleteBtn && deleteBtn.parentNode) {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+            }
+
             const errorMessage = error.message || 'Erreur inconnue lors de la suppression';
             alert(`Erreur lors de la suppression: ${errorMessage}`);
-            deleteBtn.disabled = false;
         }
     }
 
